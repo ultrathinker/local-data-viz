@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Local Data Viz: three bars and a trend line on a rounded tile, with a small folder tab at the top left. -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#14b8a6"/>
+      <stop offset="1" stop-color="#0e6f8f"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="224" height="224" rx="52" fill="url(#tile)"/>
+  <path d="M44 74h52l14 16h102v12H44z" fill="#ffffff" fill-opacity="0.35"/>
+  <g fill="#ffffff">
+    <rect x="62" y="150" width="30" height="58" rx="6"/>
+    <rect x="113" y="124" width="30" height="84" rx="6"/>
+    <rect x="164" y="104" width="30" height="104" rx="6"/>
+  </g>
+  <path d="M60 138l54-30 50-6 36-26" fill="none" stroke="#fde68a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="200" cy="76" r="9" fill="#fde68a"/>
+</svg>

@@ -1,0 +1,14 @@
+{
+  "name": "local-data-viz",
+  "owner": {
+    "name": "ultrathinker"
+  },
+  "description": "Charts for a folder of local data files, made on your computer.",
+  "plugins": [
+    {
+      "name": "local-data-viz",
+      "source": ".",
+      "description": "Turn a folder of CSV, JSON, Excel or Parquet files into a web page of charts and an explorer, built locally with DuckDB; nothing is uploaded."
+    }
+  ]
+}

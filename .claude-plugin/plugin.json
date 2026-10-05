@@ -1,0 +1,27 @@
+{
+  "name": "local-data-viz",
+  "displayName": "Local Data Viz",
+  "version": "1.4.0",
+  "description": "Point it at a folder of data files (CSV, JSON, Excel, Parquet) and get a folder with a web page of charts and an explorer, made entirely on your computer: Claude decides what to chart, DuckDB does the maths, nothing is uploaded.",
+  "author": {
+    "name": "ultrathinker"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/ultrathinker/local-data-viz",
+  "homepage": "https://github.com/ultrathinker/local-data-viz",
+  "documentationUrl": "https://github.com/ultrathinker/local-data-viz#readme",
+  "supportUrl": "https://github.com/ultrathinker/local-data-viz/issues",
+  "privacyPolicyUrl": "https://github.com/ultrathinker/local-data-viz/blob/main/PRIVACY.md",
+  "icon": "./.claude-plugin/icon.svg",
+  "keywords": [
+    "data",
+    "charts",
+    "visualization",
+    "csv",
+    "excel",
+    "parquet",
+    "duckdb",
+    "analytics",
+    "offline"
+  ]
+}

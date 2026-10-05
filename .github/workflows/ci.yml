@@ -1,0 +1,58 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  DUCKDB_VERSION: v1.5.6
+
+jobs:
+  test:
+    name: test (${{ matrix.os }}, node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [18, 20, 22, 24]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+      # The plugin has no npm dependencies. DuckDB is the one outside tool; it is downloaded here, from the project's own
+      # releases, and only for the tests.
+      - name: Install DuckDB (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" "https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/duckdb_cli-linux-amd64.zip"
+          mkdir -p "$RUNNER_TEMP/duckdb" && unzip -o "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/duckdb"
+          echo "$RUNNER_TEMP/duckdb" >> "$GITHUB_PATH"
+      - name: Install DuckDB (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" "https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/duckdb_cli-osx-universal.zip"
+          mkdir -p "$RUNNER_TEMP/duckdb" && unzip -o "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/duckdb"
+          chmod +x "$RUNNER_TEMP/duckdb/duckdb"
+          echo "$RUNNER_TEMP/duckdb" >> "$GITHUB_PATH"
+      - name: Install DuckDB (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/duckdb/duckdb/releases/download/$env:DUCKDB_VERSION/duckdb_cli-windows-amd64.zip" -OutFile "$env:RUNNER_TEMP\duckdb.zip"
+          Expand-Archive -Path "$env:RUNNER_TEMP\duckdb.zip" -DestinationPath "$env:RUNNER_TEMP\duckdb"
+          Add-Content -Path $env:GITHUB_PATH -Value "$env:RUNNER_TEMP\duckdb"
+      - name: Check the tools
+        run: node scripts/viz.mjs doctor
+      # bash expands the glob on every system: Node 18 does not expand one itself.
+      # The page tests use the browser that comes with the runner and are skipped on Node versions without a global WebSocket.
+      - name: Run the tests
+        shell: bash
+        run: node --test tests/*.test.mjs

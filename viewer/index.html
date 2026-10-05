@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file:; style-src 'self' file: 'unsafe-inline'; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Data overview</title>
+<link rel="stylesheet" href="assets/viewer.css">
+</head>
+<body>
+<div id="app" class="app">
+  <nav id="nav" class="nav" aria-label="Views"></nav>
+  <div id="splitter" class="splitter" role="separator" aria-orientation="vertical" aria-label="Menu width" tabindex="0"></div>
+  <main id="main" class="main" tabindex="-1"><p class="muted">Loading...</p></main>
+</div>
+<noscript><p style="padding:1rem">This page needs JavaScript. Nothing leaves your computer.</p></noscript>
+<script src="data/manifest.js"></script>
+<script src="assets/charts.js"></script>
+<script src="assets/viewer.js"></script>
+</body>
+</html>
