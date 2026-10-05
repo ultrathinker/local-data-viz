@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { queryAll, runProcess } from '../scripts/lib/duck.mjs';
-import { fmtNumber } from '../scripts/lib/charts.mjs';
+import { aggSql, fmtNumber } from '../scripts/lib/charts.mjs';
 import { builtFolder, duckdb, listFiles, makeTmp, runViz, snapshot } from './helpers/index.mjs';
 import { makeSampleFolder, makeXlsx } from './helpers/fixtures.mjs';
 
@@ -822,4 +822,19 @@ test('a hundred thousand rows are profiled and charted in reasonable time', opti
 test('DuckDB runs with automatic extension downloads switched off', options, async () => {
   const [[row]] = await queryAll(duck.bin, '', [`SELECT current_setting('autoinstall_known_extensions') AS a, current_setting('autoload_known_extensions') AS b`]);
   assert.deepEqual([row.a, row.b], [false, false]);
+});
+
+test('an average that falls exactly between two roundings gives the same number whatever the order of the rows', options, async () => {
+  // 32 prices in cents whose average is 45.1709375: exactly between 45.170937 and 45.170938. Added in another order, the doubles
+  // differ in the last bit, and a plain round(avg(x), 6) gave 45.170937 for one order and 45.170938 for the other.
+  const cents = [5346, 7218, 9683, 3201, 8506, 3829, 4820, 8189, 76, 1393, 7493, 4558, 6665, 9032, 1364, 4162, 5166, 3763, 8404, 4736, 488, 1151, 9227, 1769, 6561, 1767, 4767, 6333, 1095, 277, 9, 3499];
+  const rowsOf = (list) => `(VALUES ${list.map((value) => `(${value / 100}::DOUBLE)`).join(', ')}) t(v)`;
+  const asked = (list, measure) => `SELECT ${aggSql(measure)} AS r FROM ${rowsOf(list)}`;
+  const avg = { agg: 'avg', column: 'v' };
+  const [[forward], [backward], [sorted]] = await queryAll(duck.bin, 'SET threads=1;', [asked(cents, avg), asked([...cents].reverse(), avg), asked([...cents].sort((a, b) => a - b), avg)]);
+  assert.equal(forward.r, 45.170938);
+  assert.equal(backward.r, forward.r, 'the same rows added in the reverse order');
+  assert.equal(sorted.r, forward.r, 'and in sorted order');
+  const [[plain], [plainBack]] = await queryAll(duck.bin, 'SET threads=1;', [`SELECT round(avg(v), 6) AS r FROM ${rowsOf(cents)}`, `SELECT round(avg(v), 6) AS r FROM ${rowsOf([...cents].reverse())}`]);
+  assert.notEqual(plain.r, plainBack.r, 'the case really is order-sensitive without the fix');
 });

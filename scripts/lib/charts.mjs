@@ -14,11 +14,18 @@ const INTEGER_TYPE = /^U?(TINYINT|SMALLINT|INTEGER|BIGINT|HUGEINT)/i;
 
 export const dimSql = (column) => `coalesce(CAST(${ident(column)} AS VARCHAR), '(empty)')`;
 
+/**
+ * A decimal number as 6 places, the same whatever order DuckDB added the rows in. Adding doubles in another order moves the last
+ * bit, and an average that falls exactly between two roundings (0.1434375) would then round up in one build and down in the next.
+ * Cutting to 12 significant digits first removes that noise, so building twice gives the same page.
+ */
+export const stableRound = (expression) => `round(CAST(printf('%.12g', ${expression}) AS DOUBLE), 6)`;
+
 export function aggSql(measure) {
   if (measure.agg === 'count') return measure.column ? `count(${ident(measure.column)})` : 'count(*)';
   if (measure.agg === 'count_distinct') return `count(DISTINCT ${ident(measure.column)})`;
   const fn = { sum: 'sum', avg: 'avg', min: 'min', max: 'max', median: 'median' }[measure.agg];
-  return `round(${fn}(CAST(${ident(measure.column)} AS DOUBLE)), 6)`;
+  return stableRound(`${fn}(CAST(${ident(measure.column)} AS DOUBLE))`);
 }
 
 /** A date or timestamp column cut to a grain, as an ISO text that the browser reads as UTC. */
@@ -114,7 +121,7 @@ export function viewSql(view, dataset) {
   }
   const names = view.columns;
   const parts = [];
-  for (let i = 0; i < names.length; i += 1) for (let j = i + 1; j < names.length; j += 1) parts.push(`round(corr(CAST(${ident(names[i])} AS DOUBLE), CAST(${ident(names[j])} AS DOUBLE)), 6) AS r_${i}_${j}`);
+  for (let i = 0; i < names.length; i += 1) for (let j = i + 1; j < names.length; j += 1) parts.push(`${stableRound(`corr(CAST(${ident(names[i])} AS DOUBLE), CAST(${ident(names[j])} AS DOUBLE))`)} AS r_${i}_${j}`);
   return `SELECT ${parts.join(', ')} FROM ${from}`;
 }
 

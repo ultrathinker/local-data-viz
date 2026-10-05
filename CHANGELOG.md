@@ -25,6 +25,9 @@ All notable changes to this project are documented here. The format follows
 - **The page draws its charts itself**, as plain SVG, in about a thousand lines of readable code. The bundled Vega, Vega-Lite and
   Vega-Embed (868 KB of minified code) are gone: nothing third-party is shipped, the page's content policy no longer allows `eval`,
   and a chart spec now holds only titles as text. The numbers on every chart are unchanged.
+- Numbers are cut to 12 significant digits before they are rounded to six places, so building twice from the same data gives the same
+  page: an average that fell exactly between two roundings used to come out one way or the other depending on the order DuckDB added
+  the rows in.
 - One number format per axis (`0`, `10K`, `20K` rather than a mix of `5,000` and `10K`); scatter plots follow their data instead of
   starting at the next round number.
 

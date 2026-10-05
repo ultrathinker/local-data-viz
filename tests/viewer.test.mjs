@@ -190,7 +190,8 @@ test('the colours follow the light and dark theme, and the chart is redrawn when
   const lightBackground = await background();
   await p.colorScheme('dark');
   await p.goto(site(), '#/view/v1');
-  await p.waitFor('document.querySelector(".chart svg")');
+  // the page redraws when the colour scheme changes, a moment after it loads, so wait for the new colours rather than read them at once
+  await p.waitFor(`document.querySelector(".chart svg text").getAttribute("fill") !== ${JSON.stringify(lightText)} && document.querySelector(".chart svg rect").getAttribute("fill") !== ${JSON.stringify(lightBackground)}`);
   assert.notEqual(await fill(), lightText, 'the text colour changed');
   assert.notEqual(await background(), lightBackground, 'the background changed');
   await p.colorScheme('light');
