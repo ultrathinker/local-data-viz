@@ -45,7 +45,7 @@ export function installMessage(first) {
     'This plugin never installs anything itself. Install the DuckDB command-line tool once, then run the command again:',
     '  Windows:  winget install DuckDB.cli',
     '  macOS:    brew install duckdb',
-    '  Linux:    download duckdb_cli-linux-amd64.zip from https://github.com/duckdb/duckdb/releases/latest, unzip it and put `duckdb` on the PATH',
+    '  Linux:    download duckdb_cli-linux-amd64.zip from the DuckDB downloads page (duckdb.org/install), unzip it and put `duckdb` on the PATH',
     'Or set LOCAL_DATA_VIZ_DUCKDB to the full path of the duckdb program. Open a new terminal after installing so the PATH is refreshed.',
   ].join('\n');
 }

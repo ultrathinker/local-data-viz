@@ -760,13 +760,6 @@ test('counts of different values are exact, and a file that cannot be read says 
   assert.ok(skipped[1].length > 80 && !/\w$/.test(skipped[1].replace(/\.\.\.$/, '').slice(-1)) || skipped[1].endsWith('...') || skipped[1].length < 450, 'the reason is cut at a word or whole');
 });
 
-test('a web address instead of a folder is explained, not turned into a path', options, () => {
-  const result = runViz(['inspect', 'https://example.com/data.csv']);
-  assert.equal(result.code, 1);
-  assert.match(result.stderr, /is a web address\. This plugin reads a folder on this computer: download the data into a folder/);
-  assert.doesNotMatch(result.stderr, /does not exist/);
-});
-
 test('the report says when folders were too deep to read', options, () => {
   const tmp = makeTmp();
   const root = path.join(tmp, 'deep');

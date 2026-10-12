@@ -11,7 +11,7 @@ All notable changes to this project are documented here. The format follows
 ### Changed
 
 - The scripts read one setting from the environment, `LOCAL_DATA_VIZ_DUCKDB`, by name; they no longer pass the whole environment object around. Nothing else about the plugin changes.
-- The tests no longer name the README screenshot (they check every image the README shows) and the CI installs DuckDB with the GitHub command-line tool (`gh release download`) on all three systems.
+- The tests no longer name the README screenshot (they check every image the README shows) and the CI installs DuckDB with the GitHub command-line tool (`gh release download`) on all three systems. The test for a web address given instead of a folder is in its own file, and the install hint no longer spells the download address.
 
 ## [1.4.0]
 
