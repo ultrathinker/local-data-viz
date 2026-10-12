@@ -46,7 +46,7 @@ test('the manifest declares the plugin the directory expects', () => {
   assert.equal(manifest.license, 'MIT');
   assert.equal(manifest.author.name, 'ultrathinker');
   assert.equal(new URL(manifest.repository).pathname, '/ultrathinker/local-data-viz');
-  for (const field of ['documentationUrl', 'supportUrl', 'privacyPolicyUrl']) assert.ok(manifest[field]?.startsWith('https://'), `${field} is an https URL`);
+  for (const field of ['documentationUrl', 'supportUrl', 'privacyPolicyUrl']) assert.equal(new URL(manifest[field]).protocol, 'https:', `${field} is an https URL`);
   assert.equal(manifest.mcpServers, undefined, 'no server, no keys: the plugin is a skill, a command and a script');
   assert.equal(manifest.userConfig, undefined, 'nothing to configure');
   assert.ok(fs.existsSync(path.join(ROOT, '.claude-plugin', 'icon.svg')));
