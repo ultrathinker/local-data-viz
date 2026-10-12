@@ -7,11 +7,13 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { EXTENSIONS, LIMITS } from '../scripts/lib/scan.mjs';
-import { AGGS, GRAINS, KINDS, PLAN_LIMITS } from '../scripts/lib/plan.mjs';
-import { ROOT } from './helpers/index.mjs';
+import { EXTENSIONS, LIMITS } from '../plugin/scripts/lib/scan.mjs';
+import { AGGS, GRAINS, KINDS, PLAN_LIMITS } from '../plugin/scripts/lib/plan.mjs';
+import { PLUGIN, ROOT } from './helpers/index.mjs';
 
 const read = (relative) => fs.readFileSync(path.join(ROOT, relative), 'utf8').replace(/\r\n/g, '\n');
+/** A file of the plugin itself (the folder the directory installs), as a path from the repository root. */
+const inPlugin = (relative) => `plugin/${relative}`;
 
 function walk(relative, predicate = () => true) {
   const entries = [];
@@ -39,7 +41,7 @@ function trackedFiles() {
 }
 
 test('the manifest declares the plugin the directory expects', () => {
-  const manifest = JSON.parse(read('.claude-plugin/plugin.json'));
+  const manifest = JSON.parse(read(inPlugin('.claude-plugin/plugin.json')));
   assert.equal(manifest.name, 'local-data-viz');
   assert.equal(manifest.displayName, 'Local Data Viz');
   assert.match(manifest.version, /^\d+\.\d+\.\d+$/);
@@ -49,19 +51,19 @@ test('the manifest declares the plugin the directory expects', () => {
   for (const field of ['documentationUrl', 'supportUrl', 'privacyPolicyUrl']) assert.equal(new URL(manifest[field]).protocol, 'https:', `${field} is an https URL`);
   assert.equal(manifest.mcpServers, undefined, 'no server, no keys: the plugin is a skill, a command and a script');
   assert.equal(manifest.userConfig, undefined, 'nothing to configure');
-  assert.ok(fs.existsSync(path.join(ROOT, '.claude-plugin', 'icon.svg')));
-  assert.match(read('.claude-plugin/icon.svg'), /viewBox="0 0 256 256"/);
+  assert.ok(fs.existsSync(path.join(PLUGIN, '.claude-plugin', 'icon.svg')));
+  assert.match(read(inPlugin('.claude-plugin/icon.svg')), /viewBox="0 0 256 256"/);
   const changelog = read('CHANGELOG.md');
   assert.ok(changelog.includes(`## [${manifest.version}]`), 'the changelog has an entry for the manifest version');
   const marketplace = JSON.parse(read('.claude-plugin/marketplace.json'));
   assert.equal(marketplace.name, 'local-data-viz');
   assert.equal(marketplace.owner.name, 'ultrathinker');
   assert.equal(marketplace.plugins[0].name, 'local-data-viz');
-  assert.equal(marketplace.plugins[0].source, '.');
+  assert.equal(marketplace.plugins[0].source, './plugin', 'the plugin is the plugin/ folder, so the tests and the CI never ship with it');
 });
 
 test('the project documents exist and are honest-sized', () => {
-  for (const file of ['README.md', 'PRIVACY.md', 'SECURITY.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'LICENSE', '.editorconfig', '.gitignore', 'docs/PLAN-FORMAT.md']) {
+  for (const file of ['README.md', 'PRIVACY.md', 'SECURITY.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'LICENSE', '.editorconfig', '.gitignore', 'plugin/docs/overview.png', 'plugin/docs/PLAN-FORMAT.md', 'plugin/README.md', 'plugin/LICENSE']) {
     assert.ok(fs.existsSync(path.join(ROOT, file)), `${file} exists`);
   }
   const readme = read('README.md');
@@ -73,6 +75,9 @@ test('the project documents exist and are honest-sized', () => {
   for (const heading of ['## Setup', '## What it reads', '## What you get', '## How it works', '## Privacy and safety', '## Limits and known caveats', '## Verified by running', '## Development']) {
     assert.ok(readme.includes(heading), `README has "${heading}"`);
   }
+  // the folder the directory installs carries the same README (its listing text) and licence, with paths seen from inside the folder
+  assert.equal(read(inPlugin('README.md')), read('README.md').replace(' (in a clone of this repository)', '').replaceAll('plugin/', ''), 'plugin/README.md is the README with paths from inside the plugin folder');
+  assert.equal(read(inPlugin('LICENSE')), read('LICENSE'), 'plugin/LICENSE is the licence');
   assert.match(read('SECURITY.md'), /Report a vulnerability/i);
   assert.match(readme, /winget install DuckDB\.cli/);
   assert.match(readme, /brew install duckdb/);
@@ -92,19 +97,19 @@ test('the README names every format and every limit that the code has', () => {
 });
 
 test('the plan format document lists every chart kind, aggregate, grain and limit of the code', () => {
-  const doc = read('docs/PLAN-FORMAT.md');
+  const doc = read(inPlugin('docs/PLAN-FORMAT.md'));
   for (const kind of KINDS) assert.ok(doc.includes(`\`${kind}\``), `PLAN-FORMAT names the ${kind} chart`);
   for (const agg of AGGS) assert.ok(doc.includes(`\`${agg}\``), `PLAN-FORMAT names ${agg}`);
   for (const grain of GRAINS) assert.ok(doc.includes(`\`${grain}\``), `PLAN-FORMAT names ${grain}`);
   assert.ok(doc.includes(`At most ${PLAN_LIMITS.views} views`));
   assert.ok(doc.includes(`Up to ${PLAN_LIMITS.explorerDimensions} \`dimensions\``));
   assert.ok(doc.includes(`up to ${PLAN_LIMITS.explorerMeasures} \`measures\``));
-  const skill = read('skills/local-data-viz/SKILL.md');
+  const skill = read(inPlugin('skills/local-data-viz/SKILL.md'));
   for (const kind of KINDS) assert.ok(skill.includes(`\`${kind}\``), `the skill names the ${kind} chart`);
 });
 
 test('the skill and the command state the rules the code enforces', () => {
-  const skill = read('skills/local-data-viz/SKILL.md');
+  const skill = read(inPlugin('skills/local-data-viz/SKILL.md'));
   assert.match(skill, /^---\nname: local-data-viz\ndescription: .+\n---/);
   assert.ok(skill.includes('${CLAUDE_PLUGIN_ROOT}/scripts/viz.mjs'), 'scripts run through the plugin root');
   assert.doesNotMatch(skill, /[A-Za-z]:\\|\/Users\/|\/home\//, 'no personal path');
@@ -126,7 +131,7 @@ test('the skill and the command state the rules the code enforces', () => {
   assert.match(skill, /cannot join datasets, reshape a wide table[\s\S]*pie charts and\s+maps/, 'the skill says what to answer when the user asks for what the plan cannot do');
   assert.match(skill, /Decide this before the first command/, 'confidential data: say it before the first run');
   assert.equal((skill.match(/Which folder holds the data files\?/g) ?? []).length, 1, 'the one question');
-  const command = read('commands/charts.md');
+  const command = read(inPlugin('commands/charts.md'));
   assert.match(command, /^---\ndescription: .+\nargument-hint:/);
   assert.match(command, /local-data-viz/);
   assert.match(command, /\$ARGUMENTS/);
@@ -141,11 +146,11 @@ test('the docs mention only expected hosts, and the page and script make no netw
   const allowed = new Set(['www.w3.org', 'github.com', 'duckdb.org', 'claude.com', 'code.claude.com', 'keepachangelog.com', 'semver.org', 'schemas.openxmlformats.org', 'example.com', 'x']);
   const unexpected = [...hosts].filter((host) => !allowed.has(host));
   assert.deepEqual(unexpected, [], `only expected hosts are mentioned in tracked files: ${unexpected}`);
-  for (const file of ['scripts/viz.mjs', ...fs.readdirSync(path.join(ROOT, 'scripts', 'lib')).map((name) => `scripts/lib/${name}`), 'viewer/viewer.js', 'viewer/charts.js', 'viewer/index.html']) {
+  for (const file of ['scripts/viz.mjs', ...fs.readdirSync(path.join(PLUGIN, 'scripts', 'lib')).map((name) => `scripts/lib/${name}`), 'viewer/viewer.js', 'viewer/charts.js', 'viewer/index.html'].map(inPlugin)) {
     assert.doesNotMatch(read(file), /\bfetch\(|XMLHttpRequest|WebSocket|node:https?'|node:net'|node:dns'|sendBeacon|\bimport\(['"]https?/, `${file} has no network code`);
   }
   // the only child process the script starts is DuckDB
-  const spawners = fs.readdirSync(path.join(ROOT, 'scripts', 'lib')).filter((name) => /child_process/.test(read(`scripts/lib/${name}`)));
+  const spawners = fs.readdirSync(path.join(PLUGIN, 'scripts', 'lib')).filter((name) => /child_process/.test(read(inPlugin(`scripts/lib/${name}`))));
   assert.deepEqual(spawners, ['duck.mjs']);
 });
 
@@ -174,11 +179,11 @@ test('every file is small readable text, with no long minified lines', () => {
 
 test('no third-party code is bundled: the page draws its own charts, and its content policy allows no eval', () => {
   assert.ok(!fs.existsSync(path.join(ROOT, 'vendor')), 'there is no vendor folder');
-  assert.ok(fs.existsSync(path.join(ROOT, 'viewer', 'charts.js')));
-  const html = read('viewer/index.html');
+  assert.ok(fs.existsSync(path.join(PLUGIN, 'viewer', 'charts.js')));
+  const html = read(inPlugin('viewer/index.html'));
   assert.doesNotMatch(html, /unsafe-eval/);
   assert.match(html, /script-src 'self' file:;/);
   assert.deepEqual([...html.matchAll(/<script src="([^"]+)"/g)].map((match) => match[1]), ['data/manifest.js', 'assets/charts.js', 'assets/viewer.js']);
-  for (const file of ['viewer/viewer.js', 'viewer/charts.js']) assert.doesNotMatch(read(file), /innerHTML|outerHTML|insertAdjacentHTML|document\.write|\beval\(|new Function|\bimport\(/, `${file} builds no HTML from strings and runs no code from text`);
+  for (const file of ['viewer/viewer.js', 'viewer/charts.js'].map(inPlugin)) assert.doesNotMatch(read(file), /innerHTML|outerHTML|insertAdjacentHTML|document\.write|\beval\(|new Function|\bimport\(/, `${file} builds no HTML from strings and runs no code from text`);
   assert.doesNotMatch(read('README.md') + read('SECURITY.md') + read('PRIVACY.md'), /Vega|vendor\//);
 });

@@ -18,10 +18,10 @@ they open a headless browser with a temporary profile and close it when they fin
 ## Pull requests
 
 - One logical change per pull request, with a test that fails without it.
-- Keep `README.md`, `PRIVACY.md`, `SECURITY.md`, `docs/PLAN-FORMAT.md` and the skill text true: if behaviour changes, the words
+- Keep `README.md`, `PRIVACY.md`, `SECURITY.md`, `plugin/docs/PLAN-FORMAT.md` and the skill text true: if behaviour changes, the words
   change in the same pull request.
 - Column names and values from the data must never reach SQL text, a chart spec field name or `innerHTML`; see `SECURITY.md`.
-- No third-party code is bundled, and none should be: the page draws its charts itself (`viewer/charts.js`), in readable code.
+- No third-party code is bundled, and none should be: the page draws its charts itself (`plugin/viewer/charts.js`), in readable code.
 - Keep every file under 256 KiB, with no minified lines, and keep the sources ASCII.
 - Run `claude plugin validate .` if you have Claude Code installed.
 

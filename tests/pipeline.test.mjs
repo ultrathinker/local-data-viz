@@ -5,8 +5,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { queryAll, runProcess } from '../scripts/lib/duck.mjs';
-import { aggSql, fmtNumber } from '../scripts/lib/charts.mjs';
+import { queryAll, runProcess } from '../plugin/scripts/lib/duck.mjs';
+import { aggSql, fmtNumber } from '../plugin/scripts/lib/charts.mjs';
 import { builtFolder, duckdb, listFiles, makeTmp, runViz, snapshot } from './helpers/index.mjs';
 import { makeSampleFolder, makeXlsx } from './helpers/fixtures.mjs';
 

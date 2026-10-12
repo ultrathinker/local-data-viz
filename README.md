@@ -23,7 +23,7 @@ contain, writes a short plan (which numbers to add up or average, by what, over 
    - Linux: download `duckdb_cli-linux-amd64.zip` from <https://github.com/duckdb/duckdb/releases/latest>, unzip it and put
      `duckdb` on your `PATH`.
    - Or set `LOCAL_DATA_VIZ_DUCKDB` to the full path of the program. Open a new terminal afterwards so the `PATH` is refreshed.
-3. Check: `node scripts/viz.mjs doctor` (Claude runs the same check first and tells you what is missing).
+3. Check: `node plugin/scripts/viz.mjs doctor` (in a clone of this repository) (Claude runs the same check first and tells you what is missing).
 
 ## What it reads
 
@@ -52,9 +52,9 @@ A new folder next to the one you named: `<folder>-viz/run-<time>/`, with `index.
 - **Explorer:** for up to five columns (categories or dates) and a few measures, DuckDB pre-computes the grand total, every
   grouping by one column and every grouping by two. The page then lets you pick a measure, a grouping and an optional split and
   redraws instantly; the table underneath downloads as CSV.
-- **The plan** (`plan.json`) is plain JSON: edit it and build again to change the page. See `docs/PLAN-FORMAT.md`.
+- **The plan** (`plan.json`) is plain JSON: edit it and build again to change the page. See [`plugin/docs/PLAN-FORMAT.md`](plugin/docs/PLAN-FORMAT.md).
 
-![The page: menu, splitter and a chart](docs/overview.png)
+![The page: menu, splitter and a chart](plugin/docs/overview.png)
 
 ## How it works
 

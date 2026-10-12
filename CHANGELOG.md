@@ -12,6 +12,7 @@ All notable changes to this project are documented here. The format follows
 
 - The scripts read one setting from the environment, `LOCAL_DATA_VIZ_DUCKDB`, by name; they no longer pass the whole environment object around. Nothing else about the plugin changes.
 - The tests no longer name the README screenshot (they check every image the README shows) and the CI installs DuckDB with the GitHub command-line tool (`gh release download`) on all three systems. The test for a web address given instead of a folder is in its own file, and the install hint no longer spells the download address. The error messages for a wrong filter operator say "operator" in full, and the test helpers pick the few environment variables they need by name.
+- **The plugin now lives in the `plugin/` folder** of the repository (the marketplace entry points at it). The tests, the CI files and the project documents stay outside it, so what Claude Code installs is only what runs: the skill, the command, the scripts and the page. Nothing about how the plugin works or is installed changes.
 
 ## [1.4.0]
 

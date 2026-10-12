@@ -56,7 +56,7 @@ jobs:
           Expand-Archive -Path "$env:RUNNER_TEMP\duckdb_cli-windows-amd64.zip" -DestinationPath "$env:RUNNER_TEMP\duckdb"
           Add-Content -Path $env:GITHUB_PATH -Value "$env:RUNNER_TEMP\duckdb"
       - name: Check the tools
-        run: node scripts/viz.mjs doctor
+        run: node plugin/scripts/viz.mjs doctor
       # bash expands the glob on every system: Node 18 does not expand one itself.
       # The page tests use the browser that comes with the runner and are skipped on Node versions without a global WebSocket.
       - name: Run the tests

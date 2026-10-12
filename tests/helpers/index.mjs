@@ -7,10 +7,11 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { findDuckdb } from '../../scripts/lib/duck.mjs';
+import { findDuckdb } from '../../plugin/scripts/lib/duck.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-export const VIZ = path.join(ROOT, 'scripts', 'viz.mjs');
+export const PLUGIN = path.join(ROOT, 'plugin');
+export const VIZ = path.join(PLUGIN, 'scripts', 'viz.mjs');
 
 /** A new empty folder in the system temp directory (tests leave them there; they are small). */
 export function makeTmp(prefix = 'ldv-test-') {

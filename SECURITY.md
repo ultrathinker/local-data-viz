@@ -29,7 +29,7 @@ instructions. What it does about that:
   never inside the data folder. A saved profile is used again only if its file paths lie inside the data folder or the work folder.
 - **The report.** Names and values from the data are printed on one line each, with control characters removed and a length
   limit, and the skill tells Claude to treat them as data, never as instructions.
-- **No bundled code.** The page draws its charts itself, in about a thousand lines of readable code (`viewer/charts.js`); there is
+- **No bundled code.** The page draws its charts itself, in about a thousand lines of readable code (`plugin/viewer/charts.js`); there is
   no chart library, nothing minified, and the content policy allows scripts from the page's own folder only (no `unsafe-eval`).
 
 Relevant reports are about a data file that makes the script or the page do something other than draw charts, writing outside the

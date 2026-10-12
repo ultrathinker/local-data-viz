@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "local-data-viz",
-      "source": ".",
+      "source": "./plugin",
       "description": "Turn a folder of CSV, JSON, Excel or Parquet files into a web page of charts and an explorer, built locally with DuckDB; nothing is uploaded."
     }
   ]

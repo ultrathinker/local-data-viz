@@ -7,20 +7,20 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import { compareVersions, ident, lit, parseJsonArrays, pathLit } from '../scripts/lib/duck.mjs';
-import { listZip, readEntry } from '../scripts/lib/zip.mjs';
-import { dropTitleRows, readXlsx, serialToText, sheetToCsv } from '../scripts/lib/xlsx.mjs';
-import { finishView, partlyCovered } from '../scripts/lib/charts.mjs';
-import { sniffUtf16, utf8CopyOf, writeUtf8Copy } from '../scripts/lib/encoding.mjs';
-import { LIMITS, checkRoot, fingerprint, scanFolder } from '../scripts/lib/scan.mjs';
-import { classify, defaultAggregate, missingCode, pickGrain, typeFamily } from '../scripts/lib/profile.mjs';
-import { measureLabel, normalizePlan, titleOfView } from '../scripts/lib/plan.mjs';
-import { FILTER_LIMITS, describeFilter, filterKind, sourceSql } from '../scripts/lib/filters.mjs';
-import { recommendPlan } from '../scripts/lib/recommend.mjs';
-import { explainReadError } from '../scripts/lib/datasets.mjs';
-import { createRunDirectory, runStamp } from '../scripts/lib/build.mjs';
-import { parseArgs } from '../scripts/lib/args.mjs';
-import { UserError, draftPlan } from '../scripts/lib/pipeline.mjs';
+import { compareVersions, ident, lit, parseJsonArrays, pathLit } from '../plugin/scripts/lib/duck.mjs';
+import { listZip, readEntry } from '../plugin/scripts/lib/zip.mjs';
+import { dropTitleRows, readXlsx, serialToText, sheetToCsv } from '../plugin/scripts/lib/xlsx.mjs';
+import { finishView, partlyCovered } from '../plugin/scripts/lib/charts.mjs';
+import { sniffUtf16, utf8CopyOf, writeUtf8Copy } from '../plugin/scripts/lib/encoding.mjs';
+import { LIMITS, checkRoot, fingerprint, scanFolder } from '../plugin/scripts/lib/scan.mjs';
+import { classify, defaultAggregate, missingCode, pickGrain, typeFamily } from '../plugin/scripts/lib/profile.mjs';
+import { measureLabel, normalizePlan, titleOfView } from '../plugin/scripts/lib/plan.mjs';
+import { FILTER_LIMITS, describeFilter, filterKind, sourceSql } from '../plugin/scripts/lib/filters.mjs';
+import { recommendPlan } from '../plugin/scripts/lib/recommend.mjs';
+import { explainReadError } from '../plugin/scripts/lib/datasets.mjs';
+import { createRunDirectory, runStamp } from '../plugin/scripts/lib/build.mjs';
+import { parseArgs } from '../plugin/scripts/lib/args.mjs';
+import { UserError, draftPlan } from '../plugin/scripts/lib/pipeline.mjs';
 import { makeXlsx, makeZip } from './helpers/fixtures.mjs';
 import { makeTmp } from './helpers/index.mjs';
 
@@ -740,7 +740,7 @@ test('bar insights: missing values are named on their own, equal bars are not ra
 });
 
 test('zlib is the only decompressor in play (nothing else is imported by the readers)', () => {
-  const source = fs.readFileSync(new URL('../scripts/lib/zip.mjs', import.meta.url), 'utf8');
+  const source = fs.readFileSync(new URL('../plugin/scripts/lib/zip.mjs', import.meta.url), 'utf8');
   assert.ok(typeof zlib.inflateRawSync === 'function');
   assert.deepEqual([...source.matchAll(/^import .* from '([^']+)'/gm)].map((match) => match[1]), ['node:zlib']);
 });
