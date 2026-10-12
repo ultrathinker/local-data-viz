@@ -130,7 +130,7 @@ export function runProcess(bin, args, { input = '', timeoutMs = 600_000, maxByte
 }
 
 /** Which duckdb to use: the one named in LOCAL_DATA_VIZ_DUCKDB, else `duckdb` on the PATH. */
-export async function findDuckdb(named = process.env[ENV_DUCKDB]) {
+export async function findDuckdb(named = process.env.LOCAL_DATA_VIZ_DUCKDB) {
   const candidates = [];
   if (typeof named === 'string' && named.trim() !== '') candidates.push({ bin: named.trim(), via: ENV_DUCKDB });
   candidates.push({ bin: 'duckdb', via: 'PATH' });

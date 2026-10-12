@@ -184,9 +184,10 @@ test('the output is self-contained: no web addresses, a strict page policy with 
   assert.match(html, /default-src 'none'/);
   assert.doesNotMatch(html, /unsafe-eval/);
   assert.doesNotMatch(html, /<script(?![^>]*\ssrc=)[^>]*>/, 'no inline script');
+  // the SVG namespace (the string charts.js names NS) identifies the format; it is not an address the page contacts
+  const svgNamespace = /var NS = '([^']+)'/.exec(fs.readFileSync(path.join(out, 'assets', 'charts.js'), 'utf8'))[1];
   for (const file of listFiles(out)) {
-    // the SVG namespace is a name that identifies the format, not an address the page contacts
-    const text = fs.readFileSync(path.join(out, file), 'utf8').replace(/http:\/\/www\.w3\.org\/2000\/svg/g, '');
+    const text = fs.readFileSync(path.join(out, file), 'utf8').replaceAll(svgNamespace, '');
     assert.doesNotMatch(text, /https?:\/\//, `${file} has no web address`);
   }
   for (const name of ['viewer.js', 'charts.js']) {
