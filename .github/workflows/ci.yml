@@ -30,16 +30,20 @@ jobs:
       - name: Install DuckDB (Linux)
         if: runner.os == 'Linux'
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" "https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/duckdb_cli-linux-amd64.zip"
-          mkdir -p "$RUNNER_TEMP/duckdb" && unzip -o "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/duckdb"
+          gh release download "$DUCKDB_VERSION" --repo duckdb/duckdb --pattern duckdb_cli-linux-amd64.zip --dir "$RUNNER_TEMP"
+          mkdir -p "$RUNNER_TEMP/duckdb" && unzip -o "$RUNNER_TEMP/duckdb_cli-linux-amd64.zip" -d "$RUNNER_TEMP/duckdb"
           echo "$RUNNER_TEMP/duckdb" >> "$GITHUB_PATH"
       - name: Install DuckDB (macOS)
         if: runner.os == 'macOS'
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          curl -fsSL -o "$RUNNER_TEMP/duckdb.zip" "https://github.com/duckdb/duckdb/releases/download/${DUCKDB_VERSION}/duckdb_cli-osx-universal.zip"
-          mkdir -p "$RUNNER_TEMP/duckdb" && unzip -o "$RUNNER_TEMP/duckdb.zip" -d "$RUNNER_TEMP/duckdb"
+          gh release download "$DUCKDB_VERSION" --repo duckdb/duckdb --pattern duckdb_cli-osx-universal.zip --dir "$RUNNER_TEMP"
+          mkdir -p "$RUNNER_TEMP/duckdb" && unzip -o "$RUNNER_TEMP/duckdb_cli-osx-universal.zip" -d "$RUNNER_TEMP/duckdb"
           chmod +x "$RUNNER_TEMP/duckdb/duckdb"
           echo "$RUNNER_TEMP/duckdb" >> "$GITHUB_PATH"
       - name: Install DuckDB (Windows)

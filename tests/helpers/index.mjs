@@ -20,7 +20,7 @@ export function makeTmp(prefix = 'ldv-test-') {
 let duckPromise = null;
 /** { bin, versionText } when a usable DuckDB is installed, else null. */
 export function duckdb() {
-  duckPromise ??= findDuckdb(process.env).then((found) => (found.found && found.supported ? found : null));
+  duckPromise ??= findDuckdb().then((found) => (found.found && found.supported ? found : null));
   return duckPromise;
 }
 

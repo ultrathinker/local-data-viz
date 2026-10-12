@@ -1,7 +1,7 @@
 {
   "name": "local-data-viz",
   "displayName": "Local Data Viz",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Point it at a folder of data files (CSV, JSON, Excel, Parquet) and get a folder with a web page of charts and an explorer, made entirely on your computer: Claude decides what to chart, DuckDB does the maths, nothing is uploaded.",
   "author": {
     "name": "ultrathinker"

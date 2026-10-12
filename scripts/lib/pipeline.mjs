@@ -32,8 +32,8 @@ export function projectPaths(root, out) {
   return { projectDir, workDir: path.join(projectDir, '_work') };
 }
 
-export async function requireDuckdb(env = process.env) {
-  const duck = await findDuckdb(env);
+export async function requireDuckdb(named) {
+  const duck = await findDuckdb(named);
   if (!duck.found) throw new UserError(installMessage('DuckDB was not found.'), 2);
   if (!duck.supported) throw new UserError(installMessage(`DuckDB ${duck.versionText} is too old (1.0 or newer is needed).`), 2);
   return duck;
@@ -69,7 +69,7 @@ function readCache(file, root, workDir, wanted) {
 }
 
 /** Everything the next step needs: the scan, the profiled datasets (from the cache when the folder is unchanged) and the paths. */
-export async function loadProfile(input, { noValues = false, maxFiles, out, env = process.env, log = () => {} } = {}) {
+export async function loadProfile(input, { noValues = false, maxFiles, out, duckdb, log = () => {} } = {}) {
   let root;
   try {
     root = checkRoot(input);
@@ -77,7 +77,7 @@ export async function loadProfile(input, { noValues = false, maxFiles, out, env 
     throw new UserError(error.message);
   }
   const { projectDir, workDir } = projectPaths(root, out);
-  const duck = await requireDuckdb(env);
+  const duck = await requireDuckdb(duckdb);
   const limits = { ...LIMITS, ...(maxFiles ? { maxFiles } : {}) };
   const scan = scanFolder(root, limits);
   if (scan.files.length === 0) {

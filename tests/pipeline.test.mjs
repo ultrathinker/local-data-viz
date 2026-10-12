@@ -186,7 +186,7 @@ test('the output is self-contained: no web addresses, a strict page policy with 
   assert.doesNotMatch(html, /<script(?![^>]*\ssrc=)[^>]*>/, 'no inline script');
   for (const file of listFiles(out)) {
     // the SVG namespace is a name that identifies the format, not an address the page contacts
-    const text = fs.readFileSync(path.join(out, file), 'utf8').replaceAll('http://www.w3.org/2000/svg', '');
+    const text = fs.readFileSync(path.join(out, file), 'utf8').replace(/http:\/\/www\.w3\.org\/2000\/svg/g, '');
     assert.doesNotMatch(text, /https?:\/\//, `${file} has no web address`);
   }
   for (const name of ['viewer.js', 'charts.js']) {

@@ -61,10 +61,13 @@ test('the manifest declares the plugin the directory expects', () => {
 });
 
 test('the project documents exist and are honest-sized', () => {
-  for (const file of ['README.md', 'PRIVACY.md', 'SECURITY.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'LICENSE', '.editorconfig', '.gitignore', 'docs/PLAN-FORMAT.md', 'docs/overview.png']) {
+  for (const file of ['README.md', 'PRIVACY.md', 'SECURITY.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'LICENSE', '.editorconfig', '.gitignore', 'docs/PLAN-FORMAT.md']) {
     assert.ok(fs.existsSync(path.join(ROOT, file)), `${file} exists`);
   }
   const readme = read('README.md');
+  for (const [, image] of readme.matchAll(/!\[[^\]]*\]\((?!https?:)([^)\s]+)\)/g)) {
+    assert.ok(fs.existsSync(path.join(ROOT, image)), `${image}, shown in the README, exists`);
+  }
   const words = readme.replace(/```[\s\S]*?```/g, '').split(/\s+/).filter(Boolean).length;
   assert.ok(words >= 400, `README has ${words} words outside code blocks`);
   for (const heading of ['## Setup', '## What it reads', '## What you get', '## How it works', '## Privacy and safety', '## Limits and known caveats', '## Verified by running', '## Development']) {

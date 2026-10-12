@@ -23,7 +23,7 @@ const log = (message) => process.stderr.write(`[${((Date.now() - STARTED) / 1000
 async function doctor() {
   const major = Number(process.versions.node.split('.')[0]);
   const lines = [`Node ${process.versions.node}: ${major >= 18 ? 'ok' : 'too old (18 or newer is needed)'}`];
-  const duck = await findDuckdb(process.env);
+  const duck = await findDuckdb();
   if (!duck.found) lines.push(installMessage('DuckDB was not found.'));
   else if (!duck.supported) lines.push(installMessage(`DuckDB ${duck.versionText} is too old (${MIN_DUCKDB.join('.')} or newer is needed).`));
   else lines.push(`DuckDB ${duck.versionText}: ok (${duck.via})`);
