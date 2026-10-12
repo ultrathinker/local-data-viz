@@ -55,15 +55,15 @@ export function normalizeFilter(here, raw, dataset, fail, findColumn, { withData
   if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) return fail(here, 'must be an object such as { "column": "region", "op": "=", "value": "North" }');
   const allowed = withDataset ? ['dataset', ...FILTER_KEYS] : FILTER_KEYS;
   for (const key of Object.keys(raw)) if (!allowed.includes(key)) fail(here, `unknown field "${clean(key, 40)}"; allowed here: ${allowed.join(', ')}`);
-  if (!FILTER_OPS.includes(raw.op)) return fail(here, `op must be one of ${FILTER_OPS.join(', ')}`);
+  if (!FILTER_OPS.includes(raw.op)) return fail(here, `operator must be one of ${FILTER_OPS.join(', ')}`);
   const column = findColumn(dataset, raw.column);
   if (column === null) return fail(here, `column "${clean(raw.column, 60)}" is not a column of ${dataset.id} (${dataset.columns.map((c) => c.name).slice(0, 12).join(', ')}${dataset.columns.length > 12 ? ', ...' : ''})`);
   if (column.role === 'complex') return fail(here, `column "${column.name}" holds nested data and cannot be filtered`);
   const kind = filterKind(column);
   const filter = { column: column.name, op: raw.op };
-  if (raw.op === 'last' && kind !== 'time') return fail(here, `op "last" needs a date column; "${column.name}" is ${kind === 'text' ? 'text' : 'a number'}`);
-  if (ORDERED_OPS.has(raw.op) && kind === 'text') return fail(here, `op "${raw.op}" needs a number or date column; "${column.name}" is text (use =, !=, in, not_in, contains, starts_with, is_null or not_null)`);
-  if (TEXT_OPS.has(raw.op) && kind !== 'text') return fail(here, `op "${raw.op}" needs a text column; "${column.name}" is ${kind === 'time' ? 'a date' : 'a number'}`);
+  if (raw.op === 'last' && kind !== 'time') return fail(here, `operator "last" needs a date column; "${column.name}" is ${kind === 'text' ? 'text' : 'a number'}`);
+  if (ORDERED_OPS.has(raw.op) && kind === 'text') return fail(here, `operator "${raw.op}" needs a number or date column; "${column.name}" is text (use =, !=, in, not_in, contains, starts_with, is_null or not_null)`);
+  if (TEXT_OPS.has(raw.op) && kind !== 'text') return fail(here, `operator "${raw.op}" needs a text column; "${column.name}" is ${kind === 'time' ? 'a date' : 'a number'}`);
 
   const one = (field) => {
     const value = typedValue(kind, raw[field]);
@@ -149,7 +149,7 @@ function conditionSql(filter, dataset, findColumn) {
       return `${expr} > (SELECT max(CAST(${name} AS TIMESTAMP)) FROM ${ident(dataset.id)}) - INTERVAL ${filter.n} ${filter.unit.toUpperCase()}`;
     }
     default:
-      throw new Error(`unknown filter op ${String(filter.op).slice(0, 20)}`);
+      throw new Error(`unknown filter operator ${String(filter.op).slice(0, 20)}`);
   }
 }
 

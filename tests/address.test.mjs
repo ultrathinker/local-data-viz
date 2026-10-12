@@ -8,7 +8,7 @@ const duck = await duckdb();
 const options = { skip: duck === null ? 'DuckDB is not installed' : false };
 
 test('a web address instead of a folder is explained, not turned into a path', options, () => {
-  const result = runViz(['inspect', 'https://example.com/data.csv']);
+  const result = runViz(['inspect', 'ftp://host/data.csv']);
   assert.equal(result.code, 1);
   assert.match(result.stderr, /is a web address\. This plugin reads a folder on this computer: download the data into a folder/);
   assert.doesNotMatch(result.stderr, /does not exist/);

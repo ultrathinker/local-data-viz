@@ -8,12 +8,12 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { makeTmp } from './index.mjs';
 
-export function findBrowser(env = process.env) {
+export function findBrowser() {
   if (typeof WebSocket === 'undefined') return null;
   const candidates = [];
-  if (env.LDV_BROWSER) candidates.push(env.LDV_BROWSER);
+  if (process.env.LDV_BROWSER) candidates.push(process.env.LDV_BROWSER);
   if (process.platform === 'win32') {
-    const roots = [env['ProgramFiles(x86)'], env.ProgramFiles, env.LOCALAPPDATA].filter(Boolean);
+    const roots = [path.join(process.env.SystemDrive ?? 'C:', path.sep, 'Program Files (x86)'), process.env.ProgramFiles, process.env.LOCALAPPDATA].filter(Boolean);
     for (const root of roots) {
       candidates.push(path.join(root, 'Microsoft', 'Edge', 'Application', 'msedge.exe'));
       candidates.push(path.join(root, 'Google', 'Chrome', 'Application', 'chrome.exe'));
@@ -21,7 +21,7 @@ export function findBrowser(env = process.env) {
   } else if (process.platform === 'darwin') {
     candidates.push('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge', '/Applications/Chromium.app/Contents/MacOS/Chromium');
   } else {
-    for (const directory of (env.PATH ?? '').split(path.delimiter)) {
+    for (const directory of (process.env.PATH ?? '').split(path.delimiter)) {
       for (const name of ['google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser', 'microsoft-edge']) candidates.push(path.join(directory, name));
     }
   }

@@ -672,7 +672,7 @@ test('filters keep only the asked rows in charts, explorers and key numbers, wit
   fs.writeFileSync(badPlan, JSON.stringify({ version: 1, views: [{ kind: 'bar', dataset: 'ds1', x: 'department', filters: [{ column: 'department', op: '<', value: 'a' }, { column: 'visit_date', op: '>', value: 'yesterday' }] }] }));
   const refused = runViz(['build', root, '--plan', badPlan]);
   assert.equal(refused.code, 1);
-  assert.match(refused.stderr, /views\[0\]\.filters\[0\]: op "<" needs a number or date column; "department" is text/);
+  assert.match(refused.stderr, /views\[0\]\.filters\[0\]: operator "<" needs a number or date column; "department" is text/);
   assert.match(refused.stderr, /views\[0\]\.filters\[1\]: value must be a date as "2025-01-31"/);
   assert.equal(last, '2025-12-26');
 });

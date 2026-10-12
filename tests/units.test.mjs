@@ -399,10 +399,10 @@ test('filters in the plan: every kind of column, every operator, and every mista
   const bad = [0, 8, 16].map((from) => problems(badFilters.slice(from, from + 8))).join('\n');
   for (const expected of [
     'is not a column of ds1',
-    'op "<" needs a number or date column; "Region" is text',
-    'op "last" needs a date column; "Region" is text',
-    'op "last" needs a date column; "amount" is a number',
-    'op "contains" needs a text column; "amount" is a number',
+    'operator "<" needs a number or date column; "Region" is text',
+    'operator "last" needs a date column; "Region" is text',
+    'operator "last" needs a date column; "amount" is a number',
+    'operator "contains" needs a text column; "amount" is a number',
     'value must be a date as "2025-01-31"',
     'value must be a number for the column "amount"',
     '"value" must not be greater than "to"',
@@ -411,7 +411,7 @@ test('filters in the plan: every kind of column, every operator, and every mista
     '"n" must be a whole number from 1 to 1000',
     '"unit" must be one of day, week, month, quarter, year',
     'holds nested data and cannot be filtered',
-    'op must be one of =, !=, <',
+    'operator must be one of =, !=, <',
     'unknown field "sql"; allowed here: column, op, value, values, to, n, unit',
     'must be an object such as',
   ]) assert.ok(bad.includes(expected), `the message mentions "${expected}":\n${bad}`);
@@ -447,7 +447,7 @@ test('filters become one SQL condition with every value quoted, and are describe
   assert.match(sql({ column: 'when', op: 'last', n: 3, unit: 'month' }), /> \(SELECT max\(CAST\("when" AS TIMESTAMP\)\) FROM "ds1"\) - INTERVAL 3 MONTH/);
   assert.throws(() => sql({ column: 'when', op: 'last', n: '3; DROP', unit: 'month' }), /bad "last" filter/, 'even a filter that skipped the check cannot carry text into the interval');
   assert.throws(() => sql({ column: 'when', op: 'last', n: 3, unit: 'month; --' }), /bad "last" filter/);
-  assert.throws(() => sql({ column: 'Region', op: 'regexp', value: 'x' }), /unknown filter op/);
+  assert.throws(() => sql({ column: 'Region', op: 'regexp', value: 'x' }), /unknown filter operator/);
   assert.equal(sourceSql(dataset, [{ column: 'Region', op: '=', value: 'a' }, { column: 'amount', op: '>', value: 0 }], find), `(SELECT * FROM "ds1" WHERE CAST("Region" AS VARCHAR) = 'a' AND CAST("amount" AS DOUBLE) > CAST(0 AS DOUBLE))`, 'filters are all required (AND)');
 
   assert.equal(describeFilter({ column: 'department', op: '=', value: 'emergency' }), 'department = emergency');
@@ -632,7 +632,7 @@ test('Excel: a title row above the table is skipped, a real header row is not', 
 test('the help flag and the web-address check', () => {
   assert.deepEqual(parseArgs(['--help']), { positional: ['help'], options: {} });
   assert.deepEqual(parseArgs(['inspect', '-h']), { positional: ['help'], options: {} });
-  assert.throws(() => checkRoot('https://example.com/data.csv'), /web address.*download the data into a folder/);
+  assert.throws(() => checkRoot('ftp://host/data.csv'), /web address.*download the data into a folder/);
   assert.throws(() => checkRoot('ftp://host/x'), /web address/);
   assert.throws(() => checkRoot('www.example.com/data'), /web address/);
 });

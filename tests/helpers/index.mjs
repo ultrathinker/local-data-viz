@@ -24,8 +24,24 @@ export function duckdb() {
   return duckPromise;
 }
 
+/** What the child needs to find programs and a temp folder (variables that are not set are left out by spawn). */
+const childEnv = () => ({
+  PATH: process.env.PATH,
+  Path: process.env.Path,
+  PATHEXT: process.env.PATHEXT,
+  SystemRoot: process.env.SystemRoot,
+  ComSpec: process.env.ComSpec,
+  TEMP: process.env.TEMP,
+  TMP: process.env.TMP,
+  TMPDIR: process.env.TMPDIR,
+  HOME: process.env.HOME,
+  USERPROFILE: process.env.USERPROFILE,
+  LANG: process.env.LANG,
+  LOCAL_DATA_VIZ_DUCKDB: process.env.LOCAL_DATA_VIZ_DUCKDB,
+});
+
 export function runViz(args, { env = {}, cwd = ROOT } = {}) {
-  const result = spawnSync(process.execPath, [VIZ, ...args], { encoding: 'utf8', env: { ...process.env, ...env }, cwd, windowsHide: true, timeout: 300_000 });
+  const result = spawnSync(process.execPath, [VIZ, ...args], { encoding: 'utf8', env: { ...childEnv(), ...env }, cwd, windowsHide: true, timeout: 300_000 });
   return { code: result.status, stdout: result.stdout ?? '', stderr: result.stderr ?? '' };
 }
 
