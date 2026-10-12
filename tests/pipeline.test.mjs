@@ -505,7 +505,9 @@ test('a code for "missing" in a number column is reported (the value only when v
   const hidden = runViz(['inspect', root, '--no-values']);
   assert.equal(hidden.code, 0, hidden.stderr);
   assert.match(hidden.stdout, /quality: temp_c: contains an extreme value that looks like a code for "missing"/);
-  assert.doesNotMatch(hidden.stdout, /-999/, 'no value reaches the structure-only report');
+  // the saved plan's file name carries a random hash that can read as -999...: look at the report without that line
+  const report = hidden.stdout.split(/\r?\n/).filter((line) => !line.includes('plan-')).join(' ');
+  assert.doesNotMatch(report, /-999/, 'no value reaches the structure-only report');
 });
 
 test('CSV files saved as UTF-16 (little or big endian, with or without a mark) are read next to UTF-8 ones; the originals stay untouched', options, () => {
